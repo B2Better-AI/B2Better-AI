@@ -1,10 +1,14 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { CartProvider } from "./contexts/CartContext";
 import Signup from "./Signup";
 import Login from "./Login";
 import HomePage from "./HomePage";
 import Dashboard from "./Dashboard";
 import Retailers from "./Retailers";
+import RetailerProfile from "./RetailerProfile";
+import Cart from "./Cart";
+import Orders from "./Orders";
 import UserProfile from "./UserProfile";
 import Settings from "./Settings";
 
@@ -58,6 +62,30 @@ function App() {
           }
         />
         <Route
+          path="/retailer/:retailerId"
+          element={
+            <ProtectedRoute>
+              <RetailerProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orders"
+          element={
+            <ProtectedRoute>
+              <Orders />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/profile"
           element={
             <ProtectedRoute>
@@ -81,11 +109,13 @@ function App() {
   );
 }
 
-// App with AuthProvider wrapper
+// App with AuthProvider and CartProvider wrapper
 function AppWithAuth() {
   return (
     <AuthProvider>
-      <App />
+      <CartProvider>
+        <App />
+      </CartProvider>
     </AuthProvider>
   );
 }

@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./App.css";
 
 const Retailers = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("rating");
@@ -136,9 +137,6 @@ const Retailers = () => {
           <h1>Retailers & Suppliers</h1>
           <p>Discover trusted suppliers and retailers for your business needs</p>
         </div>
-        <div className="header-actions">
-          <button className="btn-primary">Add New Supplier</button>
-        </div>
       </div>
 
       {/* Filters */}
@@ -238,7 +236,12 @@ const Retailers = () => {
             </div>
 
             <div className="retailer-actions">
-              <button className="btn-primary">View Profile</button>
+              <button 
+                className="btn-primary"
+                onClick={() => navigate(`/retailer/${retailer.id}`)}
+              >
+                View Profile
+              </button>
               <button className="btn-secondary">Contact</button>
             </div>
           </div>
