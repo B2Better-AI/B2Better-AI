@@ -1,24 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "./contexts/AuthContext";
 import "./App.css";
 
 const UserProfile = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
 
   const [profileData, setProfileData] = useState({
-    name: "John Smith",
-    email: "john.smith@company.com",
-    company: "Smith Enterprises",
-    position: "Procurement Manager",
-    phone: "+1 (555) 123-4567",
-    location: "New York, NY",
-    bio: "Experienced procurement manager with 8+ years in B2B sourcing and supplier relations.",
+    name: "",
+    email: "",
+    company: "",
+    position: "",
+    phone: "",
+    location: "",
+    bio: "",
     avatar: "👤",
-    joinDate: "January 2024",
-    totalOrders: 47,
-    totalSpent: "$125,430",
-    favoriteCategories: ["Electronics", "Office Supplies", "Industrial"],
+    joinDate: "",
+    totalOrders: 0,
+    totalSpent: "$0",
+    favoriteCategories: [],
     preferences: {
       notifications: true,
       emailUpdates: true,
@@ -26,6 +28,32 @@ const UserProfile = () => {
       weeklyReports: true
     }
   });
+
+  // Update profile data when user data changes
+  useEffect(() => {
+    if (user) {
+      setProfileData(prev => ({
+        ...prev,
+        name: user.name || "",
+        email: user.email || "",
+        company: user.company || "",
+        position: user.position || "",
+        phone: user.phone || "",
+        location: user.location || "",
+        bio: user.bio || "",
+        joinDate: user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : "",
+        totalOrders: user.totalOrders || 0,
+        totalSpent: user.totalSpent ? `$${user.totalSpent.toLocaleString()}` : "$0",
+        favoriteCategories: user.favoriteCategories || [],
+        preferences: {
+          notifications: user.preferences?.notifications?.emailUpdates || true,
+          emailUpdates: user.preferences?.notifications?.emailUpdates || true,
+          smsAlerts: user.preferences?.notifications?.smsAlerts || false,
+          weeklyReports: user.preferences?.notifications?.weeklyReports || true
+        }
+      }));
+    }
+  }, [user]);
 
   const recentActivity = [
     { action: "Placed Order", details: "Order #ORD-001 with TechCorp Solutions", time: "2 hours ago", type: "order" },
@@ -59,6 +87,15 @@ const UserProfile = () => {
     alert("Profile updated successfully!");
   };
 
+  // Show loading state if user data is not available
+  if (!user) {
+    return (
+      <div className="profile-page">
+        <div className="loading">Loading profile...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="profile-page">
       {/* Header */}
@@ -68,9 +105,16 @@ const UserProfile = () => {
           <button className="change-avatar-btn">Change Photo</button>
         </div>
         <div className="profile-info">
-          <h1>{profileData.name}</h1>
-          <p className="profile-title">{profileData.position} at {profileData.company}</p>
-          <p className="profile-location">📍 {profileData.location}</p>
+          <h1>{profileData.name || "User Profile"}</h1>
+          <p className="profile-title">
+            {profileData.position && profileData.company 
+              ? `${profileData.position} at ${profileData.company}`
+              : profileData.position || profileData.company || "Complete your profile"
+            }
+          </p>
+          {profileData.location && (
+            <p className="profile-location">📍 {profileData.location}</p>
+          )}
           <div className="profile-stats">
             <div className="stat">
               <span className="stat-value">{profileData.totalOrders}</span>
@@ -81,7 +125,7 @@ const UserProfile = () => {
               <span className="stat-label">Total Spent</span>
             </div>
             <div className="stat">
-              <span className="stat-value">{profileData.joinDate}</span>
+              <span className="stat-value">{profileData.joinDate || "Recently"}</span>
               <span className="stat-label">Member Since</span>
             </div>
           </div>
@@ -202,12 +246,16 @@ const UserProfile = () => {
             <div className="form-group full-width">
               <label>Favorite Categories</label>
               <div className="category-tags">
-                {profileData.favoriteCategories.map((category, index) => (
-                  <span key={index} className="category-tag">
-                    {category}
-                    {isEditing && <button className="remove-tag">×</button>}
-                  </span>
-                ))}
+                {profileData.favoriteCategories && profileData.favoriteCategories.length > 0 ? (
+                  profileData.favoriteCategories.map((category, index) => (
+                    <span key={index} className="category-tag">
+                      {category}
+                      {isEditing && <button className="remove-tag">×</button>}
+                    </span>
+                  ))
+                ) : (
+                  <span className="no-categories">No categories selected</span>
+                )}
                 {isEditing && (
                   <button className="add-category-btn">+ Add Category</button>
                 )}

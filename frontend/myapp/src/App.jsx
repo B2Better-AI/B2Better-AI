@@ -1,9 +1,11 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
+import Navbar from "./components/Navbar";
+import LandingPage from "./LandingPage";
 import Signup from "./Signup";
 import Login from "./Login";
-import HomePage from "./HomePage";
+import HomePage from "./Homepage";
 import Dashboard from "./Dashboard";
 import Retailers from "./Retailers";
 import RetailerProfile from "./RetailerProfile";
@@ -20,7 +22,14 @@ const ProtectedRoute = ({ children }) => {
     return <div className="loading">Loading...</div>;
   }
   
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  return isAuthenticated ? (
+    <div className="app-layout">
+      <Navbar />
+      <main className="main-content">
+        {children}
+      </main>
+    </div>
+  ) : <Navigate to="/login" />;
 };
 
 function App() {
@@ -33,6 +42,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
 
@@ -103,7 +113,7 @@ function App() {
         />
 
         {/* Default route (redirect based on auth) */}
-        <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/signup"} />} />
+        <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/"} />} />
       </Routes>
     </Router>
   );

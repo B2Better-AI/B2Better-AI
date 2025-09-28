@@ -103,8 +103,8 @@ class ApiService {
     getRecentOrders: (limit = 5) =>
       this.request(`/dashboard/recent-orders?limit=${limit}`),
 
-    getRecommendations: (limit = 3) =>
-      this.request(`/dashboard/recommendations?limit=${limit}`),
+    getRecommendations: (limit = 6) =>
+      this.request(`/recommendations?limit=${limit}`),
 
     getInsights: () => this.request('/dashboard/insights'),
 

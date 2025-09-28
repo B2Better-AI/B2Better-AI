@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./App.css";
+import api from "./services/api";
 
 const Dashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("month");
@@ -19,32 +20,20 @@ const Dashboard = () => {
     { id: "#ORD-004", supplier: "Industrial Parts Co", amount: "$3,200", status: "Pending", date: "2024-01-12" }
   ];
 
-  const recommendations = [
-    { 
-      title: "Smart Office Solutions", 
-      supplier: "TechCorp Solutions", 
-      rating: 4.8, 
-      price: "$1,299",
-      savings: "Save 15%",
-      image: "💻"
-    },
-    { 
-      title: "Eco-Friendly Packaging", 
-      supplier: "Green Supplies Inc", 
-      rating: 4.6, 
-      price: "$450",
-      savings: "Save 20%",
-      image: "🌱"
-    },
-    { 
-      title: "Industrial Equipment", 
-      supplier: "Heavy Machinery Ltd", 
-      rating: 4.9, 
-      price: "$5,600",
-      savings: "Save 10%",
-      image: "⚙️"
-    }
-  ];
+  const [recommendations, setRecommendations] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const resp = await api.request('/recommendations?limit=6');
+        if (isMounted) setRecommendations(resp.data || []);
+      } catch (e) {
+        console.error('Failed to load recommendations', e);
+      }
+    })();
+    return () => { isMounted = false; };
+  }, []);
 
   return (
     <div className="dashboard">
@@ -134,18 +123,18 @@ const Dashboard = () => {
           </div>
           <div className="recommendations-grid">
             {recommendations.map((rec, index) => (
-              <div key={index} className="recommendation-card">
-                <div className="rec-image">{rec.image}</div>
+              <div key={rec.productId || index} className="recommendation-card">
+                <div className="rec-image">{rec.image ? <img src={rec.image} alt={rec.title} /> : '🛒'}</div>
                 <div className="rec-content">
                   <h3>{rec.title}</h3>
-                  <p className="supplier">{rec.supplier}</p>
+                  {rec.category && <p className="supplier">{rec.category}</p>}
                   <div className="rec-rating">
-                    <span className="stars">{"★".repeat(Math.floor(rec.rating))}</span>
-                    <span className="rating-value">{rec.rating}</span>
+                    <span className="stars">★</span>
+                    <span className="rating-value">{(rec.score || 0).toFixed(2)}</span>
                   </div>
                   <div className="rec-pricing">
-                    <span className="price">{rec.price}</span>
-                    <span className="savings">{rec.savings}</span>
+                    <span className="price">{rec.price ? `$${rec.price}` : 'Best Price'}</span>
+                    <span className="savings">Recommended</span>
                   </div>
                 </div>
                 <button className="btn-secondary">View Details</button>

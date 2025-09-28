@@ -14,6 +14,7 @@ const authRoutes = require('./routes/auth');
 const dashboardRoutes = require('./routes/dashboard');
 const retailersRoutes = require('./routes/retailers');
 const ordersRoutes = require('./routes/orders');
+const recommendationsRoutes = require('./routes/recommendations');
 
 // Import middleware
 const { errorHandler } = require('./middleware/validation');
@@ -72,6 +73,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/retailers', retailersRoutes);
 app.use('/api/orders', ordersRoutes);
+app.use('/api/recommendations', recommendationsRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
