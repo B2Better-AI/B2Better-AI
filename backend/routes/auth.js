@@ -18,43 +18,54 @@ const generateToken = (id) => {
 // @desc    Register user
 // @route   POST /api/auth/register
 // @access  Public
-router.post('/register', validateRegister, handleValidationErrors, asyncHandler(async (req, res) => {
-  const { name, email, password, company, position, phone, location, bio } = req.body;
+// @desc    Register user
+// @route   POST /api/auth/register
+// @access  Public
+router.post(
+  '/register',
+  validateRegister,      // make sure this only validates name, email, password, company, position
+  handleValidationErrors,
+  asyncHandler(async (req, res) => {
+    const { name, email, password, company, position } = req.body;
 
-  // Check if user already exists
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    return res.status(400).json({
-      success: false,
-      message: 'User already exists with this email'
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'User already exists with this email'
+      });
+    }
+
+    // Create user
+    const user = await User.create({
+      name,
+      email,
+      password,
+      company,
+      position
     });
-  }
 
-  // Create user
-  const user = await User.create({
-    name,
-    email,
-    password,
-    company,
-    position,
-    phone,
-    location,
-    bio
-  });
+    // Generate token
+    const token = generateToken(user._id);
 
-  // Generate token
-  const token = generateToken(user._id);
+    // Log activity
+    await Activity.createActivity(
+      user._id,
+      'account_created',
+      'Account created',
+      'New user registered'
+    );
 
-  // Log activity
-  await Activity.createActivity(user._id, 'account_created', 'Account created', 'New user registered');
+    res.status(201).json({
+      success: true,
+      message: 'User registered successfully',
+      token,
+      user: user.getPublicProfile()
+    });
+  })
+);
 
-  res.status(201).json({
-    success: true,
-    message: 'User registered successfully',
-    token,
-    user: user.getPublicProfile()
-  });
-}));
 
 // @desc    Login user
 // @route   POST /api/auth/login

@@ -14,7 +14,14 @@ const handleValidationErrors = (req, res, next) => {
     return res.status(400).json({
       success: false,
       message: 'Validation failed',
-      errors: errorMessages
+      errors: {
+        "success": false,
+        "message": "Validation failed",
+        "errors": [
+          { "field": "email", "message": "Valid email is required", "value": "abc" },
+          { "field": "password", "message": "Password must be at least 6 characters", "value": "123" }
+        ]
+      }      
     });
   }
   

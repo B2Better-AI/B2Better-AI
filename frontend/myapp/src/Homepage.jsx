@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import "./App.css";
@@ -8,6 +8,7 @@ const HomePage = () => {
   const { logout, user } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [products, setProducts] = useState([]);
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const toggleUserMenu = () => setUserMenuOpen(!userMenuOpen);
@@ -18,6 +19,20 @@ const HomePage = () => {
     navigate("/login");
   };
 
+  // Fetch products from FakeStore API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch("https://fakestoreapi.com/products?limit=8");
+        const data = await res.json();
+        setProducts(data);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   return (
     <div className="homepage">
       {/* Top Navigation Bar */}
@@ -26,7 +41,7 @@ const HomePage = () => {
           {/* Logo Section */}
           <div className="nav-left">
             <div className="logo-container">
-              <span className="logo-text">Qwippo</span>
+              <span className="logo-text">B2Better</span>
             </div>
           </div>
 
@@ -104,7 +119,7 @@ const HomePage = () => {
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-content">
-          <h1>Welcome to Qwippo</h1>
+          <h1>Welcome to B2Better</h1>
           <p>Your personalized B2B recommendation platform for smarter business decisions</p>
           <div className="hero-buttons">
             <button className="btn-primary">Start Shopping</button>
@@ -148,35 +163,25 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Featured Products */}
+      {/* Dynamic Products */}
       <section className="products-section">
         <div className="container">
           <h2>Featured Products</h2>
           <div className="products-grid">
-            <div className="product-card">
-              <div className="product-image">📱</div>
-              <h3>Smartphone Pro</h3>
-              <p className="product-price">$599.99</p>
-              <div className="product-rating">⭐⭐⭐⭐⭐ (4.8)</div>
-            </div>
-            <div className="product-card">
-              <div className="product-image">🎧</div>
-              <h3>Wireless Headphones</h3>
-              <p className="product-price">$199.99</p>
-              <div className="product-rating">⭐⭐⭐⭐⭐ (4.6)</div>
-            </div>
-            <div className="product-card">
-              <div className="product-image">⌚</div>
-              <h3>Smart Watch</h3>
-              <p className="product-price">$299.99</p>
-              <div className="product-rating">⭐⭐⭐⭐⭐ (4.7)</div>
-            </div>
-            <div className="product-card">
-              <div className="product-image">📷</div>
-              <h3>Digital Camera</h3>
-              <p className="product-price">$799.99</p>
-              <div className="product-rating">⭐⭐⭐⭐⭐ (4.9)</div>
-            </div>
+            {products.length > 0 ? (
+              products.map((product) => (
+                <div className="product-card" key={product.id}>
+                  <div className="product-image">
+                    <img src={product.image} alt={product.title} />
+                  </div>
+                  <h3>{product.title}</h3>
+                  <p className="product-price">${product.price}</p>
+                  <div className="product-rating">⭐ {product.rating?.rate} ({product.rating?.count})</div>
+                </div>
+              ))
+            ) : (
+              <p>Loading products...</p>
+            )}
           </div>
         </div>
       </section>
@@ -211,7 +216,7 @@ const HomePage = () => {
             </div>
           </div>
           <div className="footer-bottom">
-            <p>&copy; 2024 Qwippo. All rights reserved.</p>
+            <p>&copy; 2024 B2Better. All rights reserved.</p>
           </div>
         </div>
       </footer>

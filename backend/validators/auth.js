@@ -32,24 +32,7 @@ const validateRegister = [
     .notEmpty()
     .withMessage('Position is required')
     .isLength({ min: 2, max: 50 })
-    .withMessage('Position must be between 2 and 50 characters'),
-  
-  body('phone')
-    .optional()
-    .isMobilePhone()
-    .withMessage('Please provide a valid phone number'),
-  
-  body('location')
-    .optional()
-    .trim()
-    .isLength({ max: 100 })
-    .withMessage('Location cannot be more than 100 characters'),
-  
-  body('bio')
-    .optional()
-    .trim()
-    .isLength({ max: 500 })
-    .withMessage('Bio cannot be more than 500 characters')
+    .withMessage('Position must be between 2 and 50 characters')
 ];
 
 // User login validation

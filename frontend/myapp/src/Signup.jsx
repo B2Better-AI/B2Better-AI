@@ -6,12 +6,12 @@ import "./App.css";
 const Signup = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
-  const [form, setForm] = useState({ 
-    name: "", 
-    email: "", 
-    password: "", 
-    company: "", 
-    position: "" 
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    company: "",
+    position: ""
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,14 +27,18 @@ const Signup = () => {
 
     try {
       const result = await register(form);
-      
+
       if (result.success) {
-        navigate("/dashboard");
+        navigate("/login");
+      } else if (result.errors && result.errors.length > 0) {
+        const messages = result.errors.map(err => `${err.param}: ${err.msg}`).join(", ");
+        setError(messages);
       } else {
-        setError(result.error || "Registration failed");
+        setError(result.message || "Registration failed");
       }
-    } catch (error) {
+    } catch (err) {
       setError("An unexpected error occurred");
+      console.error("Signup error:", err);
     } finally {
       setLoading(false);
     }
@@ -46,49 +50,49 @@ const Signup = () => {
         <h2>Sign Up</h2>
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
-          <input 
-            type="text" 
-            name="name" 
-            placeholder="Full Name" 
-            value={form.name} 
-            onChange={handleChange} 
-            required 
+          <input
+            type="text"
+            name="name"
+            placeholder="Full Name"
+            value={form.name}
+            onChange={handleChange}
+            required
             disabled={loading}
           />
-          <input 
-            type="email" 
-            name="email" 
-            placeholder="Email" 
-            value={form.email} 
-            onChange={handleChange} 
-            required 
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            required
             disabled={loading}
           />
-          <input 
-            type="password" 
-            name="password" 
-            placeholder="Password" 
-            value={form.password} 
-            onChange={handleChange} 
-            required 
+          <input
+            type="password"
+            name="password"
+            placeholder="Password (min 6 chars)"
+            value={form.password}
+            onChange={handleChange}
+            required
             disabled={loading}
           />
-          <input 
-            type="text" 
-            name="company" 
-            placeholder="Company Name" 
-            value={form.company} 
-            onChange={handleChange} 
-            required 
+          <input
+            type="text"
+            name="company"
+            placeholder="Company Name"
+            value={form.company}
+            onChange={handleChange}
+            required
             disabled={loading}
           />
-          <input 
-            type="text" 
-            name="position" 
-            placeholder="Position" 
-            value={form.position} 
-            onChange={handleChange} 
-            required 
+          <input
+            type="text"
+            name="position"
+            placeholder="Position"
+            value={form.position}
+            onChange={handleChange}
+            required
             disabled={loading}
           />
           <button type="submit" disabled={loading}>
